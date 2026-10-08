@@ -1,0 +1,125 @@
+{
+    "dataset_name": "PhysioNet EEG During Mental Arithmetic Tasks (CSV Distribution)",
+    "dataset_source": "PhysioNet / Kaggle ('Complete EEG Dataset')",
+    "dataset_version": "1.0.0",
+    "local_storage_path": "./archive",
+    "total_recordings": 36,
+    "total_subjects": 36,
+    "subjects": [
+        "s00",
+        "s01",
+        "s02",
+        "s03",
+        "s04",
+        "s05",
+        "s06",
+        "s07",
+        "s08",
+        "s09",
+        "s10",
+        "s11",
+        "s12",
+        "s13",
+        "s14",
+        "s15",
+        "s16",
+        "s17",
+        "s18",
+        "s19",
+        "s20",
+        "s21",
+        "s22",
+        "s23",
+        "s24",
+        "s25",
+        "s26",
+        "s27",
+        "s28",
+        "s29",
+        "s30",
+        "s31",
+        "s32",
+        "s33",
+        "s34",
+        "s35"
+    ],
+    "recording_format": "csv",
+    "has_csv_header": false,
+    "channels": {
+        "total_channels": 19,
+        "eeg_channels_count": 19,
+        "non_eeg_channels_count": 0,
+        "channel_names": [
+            "Fp1",
+            "Fp2",
+            "F3",
+            "F4",
+            "F7",
+            "F8",
+            "T3",
+            "T4",
+            "C3",
+            "C4",
+            "T5",
+            "T6",
+            "P3",
+            "P4",
+            "O1",
+            "O2",
+            "Fz",
+            "Cz",
+            "Pz"
+        ],
+        "reference": "Linked mastoids/ears (bipolar A2-A1 excluded in CSV export)",
+        "unit": "microvolts (uV)"
+    },
+    "sampling_rate_hz": 500.0,
+    "samples_per_recording": 31000,
+    "duration_statistics_seconds": {
+        "duration_per_recording": 62.0,
+        "total_eeg_duration_seconds": 2232.0,
+        "total_eeg_duration_minutes": 37.2,
+        "average_duration_seconds": 62.0,
+        "min_duration_seconds": 62.0,
+        "max_duration_seconds": 62.0
+    },
+    "storage_statistics": {
+        "total_disk_size_bytes": 160017162,
+        "total_disk_size_mb": 152.6
+    },
+    "task_and_conditions": {
+        "task": "Mental Arithmetic (Serial subtraction of 2-digit numbers from 4-digit numbers)",
+        "experimental_condition": "Continuous arithmetic calculation state (Recording session 2)",
+        "has_event_markers": false,
+        "has_annotations": false,
+        "embedded_labels": null,
+        "label_notes": "CSV files in ./archive/ contain raw continuous 19-channel EEG signals without class label columns."
+    },
+    "temporal_characteristics": {
+        "is_continuous": true,
+        "is_sequential": true,
+        "windowing_feasible": true,
+        "recommended_window_sizes": {
+            "1_second": 500,
+            "2_second": 1000,
+            "4_second": 2000
+        }
+    },
+    "quality_metrics": {
+        "corrupted_files": 0,
+        "unreadable_files": 0,
+        "consistent_shapes": true,
+        "shapes_observed": [
+            [
+                31000,
+                19
+            ]
+        ],
+        "total_nan_values": 0,
+        "total_inf_values": 0,
+        "overall_min_uV": -582.73,
+        "overall_max_uV": 202.96,
+        "overall_mean_uV": -0.0276,
+        "overall_std_uV": 10.35
+    }
+}

@@ -1,0 +1,132 @@
+{
+    "pipeline_version": "1.0.0",
+    "original_sampling_rate_hz": 500.0,
+    "target_sampling_rate_hz": 250.0,
+    "filter_parameters": {
+        "notch_frequency_hz": 50.0,
+        "notch_q": 30.0,
+        "bandpass_lowcut_hz": 0.5,
+        "bandpass_highcut_hz": 45.0,
+        "bandpass_order": 4,
+        "filter_type": "zero-phase forward-backward Butterworth"
+    },
+    "normalization": {
+        "method": "zscore",
+        "scope": "per-subject channel-wise"
+    },
+    "windowing": {
+        "window_duration_seconds": 2.0,
+        "stride_duration_seconds": 1.0,
+        "window_samples": 500,
+        "overlap_percentage": 50.0
+    },
+    "subject_splits": {
+        "train": {
+            "count": 24,
+            "subjects": [
+                "s00",
+                "s01",
+                "s02",
+                "s03",
+                "s04",
+                "s05",
+                "s06",
+                "s07",
+                "s08",
+                "s09",
+                "s10",
+                "s11",
+                "s12",
+                "s13",
+                "s14",
+                "s15",
+                "s16",
+                "s17",
+                "s18",
+                "s19",
+                "s20",
+                "s21",
+                "s22",
+                "s23"
+            ]
+        },
+        "val": {
+            "count": 6,
+            "subjects": [
+                "s24",
+                "s25",
+                "s26",
+                "s27",
+                "s28",
+                "s29"
+            ]
+        },
+        "test": {
+            "count": 6,
+            "subjects": [
+                "s30",
+                "s31",
+                "s32",
+                "s33",
+                "s34",
+                "s35"
+            ]
+        }
+    },
+    "split_shapes": {
+        "train": {
+            "windows_shape": [
+                1464,
+                500,
+                19
+            ],
+            "next_windows_shape": [
+                1440,
+                500,
+                19
+            ],
+            "subject_ids_shape": [
+                1464
+            ],
+            "num_windows": 1464,
+            "num_samples_per_window": 500,
+            "num_channels": 19
+        },
+        "val": {
+            "windows_shape": [
+                366,
+                500,
+                19
+            ],
+            "next_windows_shape": [
+                360,
+                500,
+                19
+            ],
+            "subject_ids_shape": [
+                366
+            ],
+            "num_windows": 366,
+            "num_samples_per_window": 500,
+            "num_channels": 19
+        },
+        "test": {
+            "windows_shape": [
+                366,
+                500,
+                19
+            ],
+            "next_windows_shape": [
+                360,
+                500,
+                19
+            ],
+            "subject_ids_shape": [
+                366
+            ],
+            "num_windows": 366,
+            "num_samples_per_window": 500,
+            "num_channels": 19
+        }
+    }
+}

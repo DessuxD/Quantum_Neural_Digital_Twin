@@ -1,0 +1,38 @@
+{
+    "classical_baseline": {
+        "total_params": 269826,
+        "epochs_run": 20,
+        "best_val_loss": 0.9283,
+        "test_mse": 0.8458,
+        "test_mae": 0.7148,
+        "test_cosine_sim": 0.386,
+        "total_time_sec": 1703.78
+    },
+    "quantum_4q_1l": {
+        "total_params": 219882,
+        "epochs_run": 20,
+        "best_val_loss": 0.962,
+        "test_mse": 0.8771,
+        "test_mae": 0.7314,
+        "test_cosine_sim": 0.3561,
+        "total_time_sec": 1991.33
+    },
+    "quantum_4q_2l": {
+        "total_params": 219894,
+        "epochs_run": 20,
+        "best_val_loss": 0.9639,
+        "test_mse": 0.8819,
+        "test_mae": 0.7327,
+        "test_cosine_sim": 0.3405,
+        "total_time_sec": 725.31
+    },
+    "quantum_6q_1l": {
+        "total_params": 219974,
+        "epochs_run": 20,
+        "best_val_loss": 0.9529,
+        "test_mse": 0.869,
+        "test_mae": 0.7265,
+        "test_cosine_sim": 0.3563,
+        "total_time_sec": 710.53
+    }
+}

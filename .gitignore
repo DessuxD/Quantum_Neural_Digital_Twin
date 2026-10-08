@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments and local tooling
+.venv/
+venv/
+env/
+.idea/
+.vscode/
+
+# Raw EEG data (obtain separately)
+/archive/*
+!/archive/.gitkeep
+/data/raw/
+
+# Reproducible, large processed arrays
+/data/processed/*.npy
+/data/processed/continuous/
+/data/processed/windows/
+
+# Binary model checkpoints
+/checkpoints/*.pt
+/results/**/*.pt
+
+# Local temporary/cache files
+*.tmp
+*.log
+Thumbs.db
+Desktop.ini
