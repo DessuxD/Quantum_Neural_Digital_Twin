@@ -12,11 +12,12 @@ Access at: http://localhost:5000
 """
 
 from __future__ import annotations
-import os, sys, json
+import os, sys, json, io, re
 from pathlib import Path
 from typing import Dict, Any, Optional
 
 import numpy as np
+import pandas as pd
 import torch
 from flask import Flask, render_template, jsonify, request, send_from_directory
 
@@ -122,8 +123,6 @@ def api_status():
 
     return jsonify({
         "project": "Quantum Neural Digital Twin of the Human Brain",
-        "authors": "Aritra, Abhinandita, Dipradeb, Sayak",
-        "institution": "Department of Computer Science & Engineering, VIT-AP University",
         "dataset": "PhysioNet EEG During Mental Arithmetic Tasks (36 Subjects, 19 Channels, 250 Hz)",
         "available_channels": CHANNEL_NAMES,
         "models_count": len(abl_summary),
@@ -136,6 +135,14 @@ def api_status():
 @app.route("/api/subjects")
 def api_subjects():
     subjects = []
+    # Check for custom uploaded subjects first
+    cont_dir = ROOT / "data/processed/continuous"
+    if cont_dir.exists():
+        for custom_path in sorted(cont_dir.glob("custom_*_clean.npy")):
+            cid = custom_path.stem.replace("_clean", "")
+            disp_name = cid.replace("custom_", "").replace("_", " ").title()
+            subjects.append({"id": cid, "split": "custom", "label": f"Custom: {disp_name}"})
+
     for s_idx in range(36):
         sid = f"s{s_idx:02d}"
         if s_idx < 24:
@@ -146,6 +153,94 @@ def api_subjects():
             split = "test"  # Unseen test subjects (s30-s35)
         subjects.append({"id": sid, "split": split, "label": f"Subject {s_idx:02d} ({split.upper()})"})
     return jsonify(subjects)
+
+
+@app.route("/api/upload", methods=["POST"])
+def api_upload():
+    if "file" not in request.files:
+        return jsonify({"error": "No file uploaded in request."}), 400
+
+    file = request.files["file"]
+    if not file or file.filename == "":
+        return jsonify({"error": "No file selected."}), 400
+
+    filename = file.filename.lower()
+    raw_stem = Path(file.filename).stem
+    safe_name = re.sub(r'[^a-zA-Z0-9_-]', '_', raw_stem)[:30]
+    if not safe_name:
+        safe_name = "recording"
+
+    try:
+        if filename.endswith(".npy"):
+            arr = np.load(file.stream)
+            if arr.ndim != 2:
+                return jsonify({"error": f"NPY array must be 2D, got shape {arr.shape}."}), 400
+            if arr.shape[0] == 19 and arr.shape[1] > 19:
+                arr = arr.T  # Transpose to (N, 19)
+            elif arr.shape[1] != 19:
+                if arr.shape[1] > 19:
+                    arr = arr[:, :19]
+                else:
+                    pad = np.zeros((arr.shape[0], 19 - arr.shape[1]), dtype=arr.dtype)
+                    arr = np.hstack([arr, pad])
+
+        elif filename.endswith(".csv"):
+            df = pd.read_csv(file.stream)
+            col_map = {str(c).strip().lower(): c for c in df.columns}
+            matched_cols = []
+            for ch in CHANNEL_NAMES:
+                if ch.lower() in col_map:
+                    matched_cols.append(col_map[ch.lower()])
+
+            if len(matched_cols) == 19:
+                arr = df[matched_cols].values
+            else:
+                numeric_df = df.select_dtypes(include=[np.number])
+                if numeric_df.shape[1] == 0:
+                    return jsonify({"error": "CSV contains no numerical columns."}), 400
+                if numeric_df.shape[1] >= 19:
+                    arr = numeric_df.iloc[:, :19].values
+                else:
+                    arr = numeric_df.values
+                    pad = np.zeros((arr.shape[0], 19 - arr.shape[1]), dtype=np.float32)
+                    arr = np.hstack([arr, pad])
+        else:
+            return jsonify({"error": "Unsupported file format. Please upload a .csv or .npy file."}), 400
+
+        # Replace NaN / Inf with 0.0
+        arr = np.nan_to_num(arr.astype(np.float32), nan=0.0, posinf=0.0, neginf=0.0)
+
+        # Ensure length (need at least 2 consecutive windows: 500 + 250 = 750 samples)
+        if arr.shape[0] < 750:
+            return jsonify({
+                "error": f"Signal length is {arr.shape[0]} samples. Digital twin requires at least 750 samples (3.0 seconds at 250 Hz)."
+            }), 400
+
+        # Channel-wise standard Z-score normalization
+        means = np.mean(arr, axis=0, keepdims=True)
+        stds = np.std(arr, axis=0, keepdims=True)
+        stds[stds == 0] = 1.0
+        arr_normalized = (arr - means) / stds
+
+        # Persist to continuous processed data
+        cont_dir = ROOT / "data/processed/continuous"
+        cont_dir.mkdir(parents=True, exist_ok=True)
+        out_file = cont_dir / f"custom_{safe_name}_clean.npy"
+        np.save(out_file, arr_normalized.astype(np.float32))
+
+        subject_id = f"custom_{safe_name}"
+        num_windows = (arr.shape[0] - 500) // 250
+
+        return jsonify({
+            "success": True,
+            "subject_id": subject_id,
+            "label": f"Custom: {safe_name.replace('_', ' ').title()}",
+            "num_samples": int(arr.shape[0]),
+            "num_windows": int(num_windows),
+            "channels_used": 19,
+        })
+    except Exception as e:
+        return jsonify({"error": f"Failed to parse and process EEG file: {str(e)}"}), 500
 
 
 @app.route("/api/step", methods=["POST"])
