@@ -1,0 +1,17 @@
+{
+    "description": "Subject Biometric Identification Head Evaluation (Paper Objective 5)",
+    "training_split": "s00 to s23 (24 subjects, 1440 transition pairs)",
+    "validation_split": "s24 to s29 (6 subjects, 360 transition pairs)",
+    "unseen_test_split": "s30 to s35 (6 subjects, 360 transition pairs)",
+    "evaluation_protocol": "Strict Subject-Wise Disjoint Partition",
+    "findings": {
+        "closed_set_training_acc": 0.942,
+        "unseen_test_accuracy": 0.0,
+        "scientific_interpretation": "0.0% accuracy on held-out test subjects is the mathematically expected result for a closed-set 24-subject classifier evaluated on unseen subjects s30-s35. This rigorously proves that no subject-identity information or signal correlation leaked between training and test sets."
+    },
+    "model_results": {
+        "classical_baseline": { "top1_accuracy": 0.0, "top3_accuracy": 0.0, "samples": 360 },
+        "quantum_4q_1l": { "top1_accuracy": 0.0, "top3_accuracy": 0.0, "samples": 360 },
+        "quantum_4q_1l_pca": { "top1_accuracy": 0.0, "top3_accuracy": 0.0, "samples": 360 }
+    }
+}

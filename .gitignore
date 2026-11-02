@@ -21,12 +21,13 @@ env/
 
 # Reproducible, large processed arrays
 /data/processed/*.npy
-/data/processed/continuous/
 /data/processed/windows/
+!/data/processed/continuous/
+!/data/processed/continuous/*.npy
 
-# Binary model checkpoints
-/checkpoints/*.pt
-/results/**/*.pt
+# Binary model checkpoints (keep checkpoints needed for deployment)
+# /checkpoints/*.pt
+# /results/**/*.pt
 
 # Local temporary/cache files
 *.tmp

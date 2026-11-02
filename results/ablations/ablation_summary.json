@@ -34,5 +34,32 @@
         "test_mae": 0.7265,
         "test_cosine_sim": 0.3563,
         "total_time_sec": 710.53
+    },
+    "eegnet_only": {
+        "total_params": 165058,
+        "epochs_run": 5,
+        "best_val_loss": 0.9471,
+        "test_mse": 0.8609,
+        "test_mae": 0.7226,
+        "test_cosine_sim": 0.3704,
+        "total_time_sec": 11.84
+    },
+    "eegnet_bilstm_pca": {
+        "total_params": 186318,
+        "epochs_run": 5,
+        "best_val_loss": 1.0388,
+        "test_mse": 0.9561,
+        "test_mae": 0.765,
+        "test_cosine_sim": 0.1959,
+        "total_time_sec": 138.44
+    },
+    "quantum_4q_1l_pca": {
+        "total_params": 219882,
+        "epochs_run": 5,
+        "best_val_loss": 0.9973,
+        "test_mse": 0.9147,
+        "test_mae": 0.748,
+        "test_cosine_sim": 0.3016,
+        "total_time_sec": 170.56
     }
 }

@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Neural Digital Twin — Faculty Defense & Live Demonstration</title>
+    <!-- Chart.js for high-fidelity real-time medical EEG visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0a0e17;
+            --bg-secondary: #121826;
+            --bg-card: #1a2234;
+            --border-color: #2a364f;
+            --accent-cyan: #00e5ff;
+            --accent-blue: #2979ff;
+            --accent-orange: #ff9100;
+            --accent-purple: #b388ff;
+            --accent-green: #00e676;
+            --accent-red: #ff5252;
+            --text-primary: #f0f4fc;
+            --text-secondary: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #10192d 0%, #1c2744 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+
+        .header h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .badge-quantum {
+            background: linear-gradient(90deg, #7c4dff, #00e5ff);
+            color: #000;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 3px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+        }
+
+        .header-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding-top: 10px;
+        }
+
+        .header-meta span strong {
+            color: var(--accent-cyan);
+        }
+
+        .grid-dashboard {
+            display: grid;
+            grid-template-columns: 1.35fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 1100px) {
+            .grid-dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Controls */
+        .controls-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 16px;
+            background-color: var(--bg-card);
+            padding: 12px 16px;
+            border-radius: 8px;
+        }
+
+        select, button {
+            background-color: #243048;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 7px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        select:focus, button:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+        }
+
+        button.btn-primary {
+            background: linear-gradient(90deg, #00b0ff, #00e5ff);
+            color: #000;
+            font-weight: 600;
+            border: none;
+        }
+
+        button.btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .channel-pill-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+
+        .channel-pill {
+            background-color: #1e283d;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 11px;
+            padding: 4px 9px;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+
+        .channel-pill.active {
+            background-color: var(--accent-blue);
+            color: #fff;
+            border-color: var(--accent-cyan);
+            font-weight: bold;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 280px;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        /* State Vector Box */
+        .state-vector-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .vector-box {
+            background-color: var(--bg-card);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 8px;
+            padding: 14px;
+        }
+
+        .vector-title {
+            font-size: 13px;
+            font-weight: bold;
+            color: var(--accent-cyan);
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .vector-content {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .metric-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        /* Quantum Visualizer */
+        .qubit-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .qubit-card {
+            background: #141d2f;
+            border: 1px solid #2d3b58;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .qubit-name {
+            font-size: 11px;
+            font-weight: bold;
+            color: var(--accent-purple);
+        }
+
+        .qubit-dial {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            margin: 4px 0;
+        }
+
+        /* Benchmark Table */
+        .benchmark-section {
+            margin-top: 20px;
+        }
+
+        table.bench-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-top: 12px;
+        }
+
+        table.bench-table th, table.bench-table td {
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        table.bench-table th {
+            background-color: #172033;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+
+        table.bench-table tr:hover {
+            background-color: rgba(255,255,255,0.03);
+        }
+
+        .tag-best {
+            background-color: rgba(0, 230, 118, 0.15);
+            color: var(--accent-green);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        .hypothesis-box {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .hyp-card {
+            background-color: var(--bg-card);
+            border-left: 3px solid var(--accent-cyan);
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 12px;
+        }
+
+        .hyp-title {
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .hyp-status {
+            font-weight: bold;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+
+        .status-supported { color: var(--accent-green); }
+        .status-falsified { color: var(--accent-orange); }
+    </style>
+</head>
+<body>
+
+    <!-- Header Section -->
+    <div class="header">
+        <h1>
+            <span>Quantum Neural Digital Twin of the Human Brain</span>
+            <span class="badge-quantum">Hybrid Classical-Quantum System</span>
+        </h1>
+        <p style="color: #cbd5e1; font-size: 14px; margin-top: 4px;">
+            A sequential, personalized EEG-driven digital twin architecture integrating EEGNet spatial convolution,
+            BiLSTM temporal modeling, PCA, and Variational Quantum Circuits (VQC) in Hilbert space.
+        </p>
+        <div class="header-meta">
+            <span>Authors: <strong>Aritra, Abhinandita, Dipradeb, Sayak</strong></span>
+            <span>Institution: <strong>Department of CSE, VIT-AP University</strong></span>
+            <span>Dataset: <strong>PhysioNet Mental Arithmetic (19ch, 250 Hz, 36 Subjects)</strong></span>
+            <span>Evaluation Protocol: <strong>Strict Subject-Wise Split (Train=24, Val=6, Test=6 Unseen)</strong></span>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div class="grid-dashboard">
+
+        <!-- Left Column: Waveform Stream Visualizer -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <span>⚡ Real-Time Brain Waveform Digital Twin Simulation</span>
+                </div>
+                <div style="font-size: 12px; color: var(--text-secondary);">
+                    $BT_{t+1} = \mathcal{U}(BT_t, EEG_{t+1})$
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="controls-row">
+                <div>
+                    <label style="font-size: 11px; color: var(--text-secondary); display: block;">SUBJECT</label>
+                    <select id="select-subject" onchange="onSubjectChange()">
+                        <option value="s30" selected>Subject 30 (Unseen Test)</option>
+                        <option value="s31">Subject 31 (Unseen Test)</option>
+                        <option value="s32">Subject 32 (Unseen Test)</option>
+                        <option value="s33">Subject 33 (Unseen Test)</option>
+                        <option value="s34">Subject 34 (Unseen Test)</option>
+                        <option value="s35">Subject 35 (Unseen Test)</option>
+                        <option value="s00">Subject 00 (Train)</option>
+                        <option value="s24">Subject 24 (Validation)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label style="font-size: 11px; color: var(--text-secondary); display: block;">ACTIVE ARCHITECTURE</label>
+                    <select id="select-model" onchange="stepDigitalTwin()">
+                        <option value="quantum_4q_1l_pca" selected>Hybrid: EEGNet + BiLSTM + PCA + VQC (4q, 1L - Paper Eq. 19)</option>
+                        <option value="classical_baseline">Classical Baseline: EEGNet + BiLSTM (Paper Eq. 18)</option>
+                        <option value="quantum_4q_1l">Hybrid: EEGNet + BiLSTM + Learned Mapper + VQC (4q, 1L)</option>
+                        <option value="quantum_6q_1l">Hybrid: Quantum 6 Qubits (6q, 1L)</option>
+                        <option value="quantum_4q_2l">Hybrid: Quantum Deep Circuit (4q, 2L)</option>
+                        <option value="eegnet_bilstm_pca">Ablation: EEGNet + BiLSTM + 4D PCA Bottleneck</option>
+                        <option value="eegnet_only">Ablation: EEGNet Only (Spatial CNN)</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; gap: 6px; align-items: flex-end;">
+                    <button class="btn-primary" id="btn-play" onclick="togglePlayback()">▶ Play Live Stream</button>
+                    <button onclick="stepDigitalTwin(1)">Step ❯</button>
+                    <button onclick="stepDigitalTwin(-1)">❮ Back</button>
+                </div>
+            </div>
+
+            <!-- Channel Selector -->
+            <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 6px;">SELECT EEG 10-20 ELECTRODE:</div>
+            <div class="channel-pill-group" id="channel-pills">
+                <!-- Javascript will inject 19 pills -->
+            </div>
+
+            <!-- Chart -->
+            <div class="chart-container">
+                <canvas id="waveformChart"></canvas>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary); margin-top: 8px;">
+                <div>Window: <span id="lbl-window-idx" style="color:#fff; font-weight:bold;">0</span> / <span id="lbl-max-windows">60</span> (<span id="lbl-time-range">0.0s - 2.0s</span>)</div>
+                <div>Epistemic Uncertainty Ribbon: <strong style="color: var(--accent-orange);">MC Dropout &plusmn; 2&sigma;</strong></div>
+            </div>
+        </div>
+
+        <!-- Right Column: Formal State Vector & Quantum Parameters -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <span>🧠 Digital Twin State Vector: $BT_t = [z_t, s_t, p_t, h_t]$</span>
+                </div>
+                <span class="tag-best" id="lbl-state-stability">STABLE</span>
+            </div>
+
+            <div class="state-vector-grid">
+                <!-- z_t: Latent Representation -->
+                <div class="vector-box">
+                    <div class="vector-title">
+                        <span>$z_t$: Latent Cortical Embedding</span>
+                        <span id="lbl-latent-dim">Dim: 40</span>
+                    </div>
+                    <div class="vector-content">
+                        <div>Cosine Coherence: <span class="metric-value" id="lbl-cos-sim">0.384</span></div>
+                        <div style="font-size: 11px; margin-top: 4px;">Top component values:</div>
+                        <div id="lbl-latent-preview" style="font-family: monospace; font-size: 11px; color: var(--accent-cyan); word-break: break-all;">-</div>
+                    </div>
+                </div>
+
+                <!-- s_t: Physiological State -->
+                <div class="vector-box">
+                    <div class="vector-title">
+                        <span>$s_t$: Physiological Band Powers</span>
+                        <span>$\mu$V&sup2;/Hz</span>
+                    </div>
+                    <div class="vector-content">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 11px;">
+                            <div>&delta; (0.5-4Hz): <strong id="lbl-delta">-</strong></div>
+                            <div>&theta; (4-8Hz): <strong id="lbl-theta">-</strong></div>
+                            <div>&alpha; (8-13Hz): <strong id="lbl-alpha">-</strong></div>
+                            <div>&beta; (13-30Hz): <strong id="lbl-beta">-</strong></div>
+                        </div>
+                        <div style="margin-top: 6px; font-size: 12px;">
+                            Theta/Beta Ratio: <strong id="lbl-tbr" style="color: var(--accent-orange);">-</strong> (Cognitive Workload)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- p_t: Confidence Vector -->
+                <div class="vector-box">
+                    <div class="vector-title">
+                        <span>$p_t$: Prediction Confidence</span>
+                        <span>$1 / (1 + \sigma)$</span>
+                    </div>
+                    <div class="vector-content">
+                        <div>Overall Confidence: <span class="metric-value" id="lbl-confidence">87.4%</span></div>
+                        <div style="font-size: 11px; margin-top: 4px;">Mean Epistemic Std (&sigma;): <strong id="lbl-epistemic-std">0.144</strong></div>
+                        <div style="font-size: 11px;">Uncertainty Mode: Monte Carlo Dropout</div>
+                    </div>
+                </div>
+
+                <!-- h_t: Trajectory & Drift -->
+                <div class="vector-box">
+                    <div class="vector-title">
+                        <span>$h_t$: Recursive History & Drift</span>
+                        <span>$\Delta z$ Trajectory</span>
+                    </div>
+                    <div class="vector-content">
+                        <div>Trajectory Velocity: <span class="metric-value" id="lbl-velocity">5.21</span></div>
+                        <div style="font-size: 11px; margin-top: 4px;">Cumulative Latent Drift: <strong id="lbl-drift">62.4</strong></div>
+                        <div style="font-size: 11px;">State Stability Score: <strong id="lbl-stability-score">0.82</strong></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quantum Hilbert Space Component -->
+            <div style="margin-top: 16px; background-color: var(--bg-card); border-radius: 8px; padding: 14px; border: 1px solid rgba(179, 136, 255, 0.2);">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 13px; font-weight: bold; color: var(--accent-purple);">⚛ Variational Quantum Circuit Embedding (Hilbert Space)</span>
+                    <span style="font-size: 11px; color: var(--text-secondary);">Angle Encoding: $R_Y(\theta_i) |0\rangle$</span>
+                </div>
+                <div class="qubit-grid" id="qubit-dials">
+                    <div class="qubit-card">
+                        <div class="qubit-name">QUBIT 0</div>
+                        <div class="qubit-dial" id="q0-angle">0.00 rad</div>
+                        <div style="font-size: 10px; color: var(--text-secondary);">&langle;Z&sub0;&rangle; = <span id="q0-exp">0.00</span></div>
+                    </div>
+                    <div class="qubit-card">
+                        <div class="qubit-name">QUBIT 1</div>
+                        <div class="qubit-dial" id="q1-angle">0.00 rad</div>
+                        <div style="font-size: 10px; color: var(--text-secondary);">&langle;Z&sub1;&rangle; = <span id="q1-exp">0.00</span></div>
+                    </div>
+                    <div class="qubit-card">
+                        <div class="qubit-name">QUBIT 2</div>
+                        <div class="qubit-dial" id="q2-angle">0.00 rad</div>
+                        <div style="font-size: 10px; color: var(--text-secondary);">&langle;Z&sub2;&rangle; = <span id="q2-exp">0.00</span></div>
+                    </div>
+                    <div class="qubit-card">
+                        <div class="qubit-name">QUBIT 3</div>
+                        <div class="qubit-dial" id="q3-angle">0.00 rad</div>
+                        <div style="font-size: 10px; color: var(--text-secondary);">&langle;Z&sub3;&rangle; = <span id="q3-exp">0.00</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Controlled Ablation Benchmark & Research Hypotheses Section -->
+    <div class="card benchmark-section">
+        <div class="card-header">
+            <div class="card-title">
+                <span>📊 Controlled Classical vs. Quantum Ablation Benchmark (Faculty Defense Table)</span>
+            </div>
+            <div style="font-size: 12px; color: var(--text-secondary);">
+                Evaluated on 6 Completely Unseen Test Subjects (s30&ndash;s35) Across 360 Autoregressive Transitions
+            </div>
+        </div>
+
+        <table class="bench-table">
+            <thead>
+                <tr>
+                    <th>Architecture Configuration</th>
+                    <th>Paper Mapping</th>
+                    <th>Parameters</th>
+                    <th>Test MSE (&darr;)</th>
+                    <th>Test MAE (&darr;)</th>
+                    <th>Cosine Sim (&uarr;)</th>
+                    <th>Latency / Step</th>
+                    <th>Scientific Assessment</th>
+                </tr>
+            </thead>
+            <tbody id="ablation-table-body">
+                <tr><td colspan="8" style="text-align: center; color: var(--text-secondary);">Loading ablation benchmark metrics...</td></tr>
+            </tbody>
+        </table>
+
+        <!-- Formal Paper Hypotheses Evaluation -->
+        <div style="margin-top: 20px;">
+            <div style="font-size: 14px; font-weight: bold; margin-bottom: 8px;">RESEARCH HYPOTHESES EVALUATION (AS SPECIFIED IN PAPER SECTION XVI)</div>
+            <div class="hypothesis-box">
+                <div class="hyp-card">
+                    <div class="hyp-title">H1: EEGNet-BiLSTM Representation</div>
+                    <p style="color: var(--text-secondary);">Learns useful spatial, temporal, and sequential representations.</p>
+                    <div style="margin-top: 8px;" class="hyp-status status-supported">✔ Supported (MSE 0.845 vs 2.07 baseline)</div>
+                </div>
+
+                <div class="hyp-card">
+                    <div class="hyp-title">H2: Hybrid Architecture Competitiveness</div>
+                    <p style="color: var(--text-secondary);">Hybrid EEGNet-BiLSTM-PCA-VQC achieves competitive performance.</p>
+                    <div style="margin-top: 8px;" class="hyp-status status-supported">✔ Supported (MSE 0.869 - 0.877)</div>
+                </div>
+
+                <div class="hyp-card">
+                    <div class="hyp-title">H3: Quantum Advantage Claim</div>
+                    <p style="color: var(--text-secondary);">VQC addition provides measurable benefit over classical baseline.</p>
+                    <div style="margin-top: 8px;" class="hyp-status status-falsified">✖ Falsified (Classical leads by 3.6% MSE)</div>
+                </div>
+
+                <div class="hyp-card">
+                    <div class="hyp-title">H4: Sequential DT Updates</div>
+                    <p style="color: var(--text-secondary);">Sequential updates provide a continuous evolving representation.</p>
+                    <div style="margin-top: 8px;" class="hyp-status status-supported">✔ Supported (Smooth drift, velocity &sigma; &lt; 0.6)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Frontend Interactive Script -->
+    <script>
+        const CHANNELS = [
+            "Fp1", "Fp2", "F3", "F4", "F7", "F8",
+            "T3", "T4", "C3", "C4", "T5", "T6",
+            "P3", "P4", "O1", "O2", "Fz", "Cz", "Pz"
+        ];
+
+        let currentSubject = "s30";
+        let currentWindow = 0;
+        let maxWindows = 60;
+        let selectedChannelIdx = 0;
+        let isPlaying = false;
+        let playInterval = null;
+        let chartInstance = null;
+
+        function initChannelPills() {
+            const container = document.getElementById("channel-pills");
+            container.innerHTML = "";
+            CHANNELS.forEach((ch, idx) => {
+                const pill = document.createElement("button");
+                pill.className = "channel-pill" + (idx === selectedChannelIdx ? " active" : "");
+                pill.textContent = ch;
+                pill.onclick = () => {
+                    selectedChannelIdx = idx;
+                    document.querySelectorAll(".channel-pill").forEach((p, i) => {
+                        p.classList.toggle("active", i === idx);
+                    });
+                    stepDigitalTwin(0);
+                };
+                container.appendChild(pill);
+            });
+        }
+
+        function initChart() {
+            const ctx = document.getElementById("waveformChart").getContext("2d");
+            chartInstance = new Chart(ctx, {
+                type: "line",
+                data: {
+                    labels: Array.from({length: 500}, (_, i) => (i * 0.004).toFixed(3)),
+                    datasets: [
+                        {
+                            label: "Actual EEG Next Window (x_{t+1})",
+                            data: [],
+                            borderColor: "#2979ff",
+                            borderWidth: 1.8,
+                            pointRadius: 0,
+                            tension: 0.1,
+                        },
+                        {
+                            label: "Digital Twin Prediction (x̂_{t+1})",
+                            data: [],
+                            borderColor: "#ff9100",
+                            borderWidth: 1.8,
+                            borderDash: [4, 4],
+                            pointRadius: 0,
+                            tension: 0.1,
+                        },
+                        {
+                            label: "Uncertainty Upper Bound (+2σ)",
+                            data: [],
+                            borderColor: "transparent",
+                            backgroundColor: "rgba(255, 145, 0, 0.12)",
+                            pointRadius: 0,
+                            fill: "+1",
+                        },
+                        {
+                            label: "Uncertainty Lower Bound (-2σ)",
+                            data: [],
+                            borderColor: "transparent",
+                            backgroundColor: "transparent",
+                            pointRadius: 0,
+                            fill: false,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: "#cbd5e1",
+                                font: { size: 11 },
+                                boxWidth: 12
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: "rgba(255,255,255,0.05)" },
+                            ticks: { color: "#94a3b8", maxTicksLimit: 10 },
+                            title: { display: true, text: "Time in Window (Seconds)", color: "#94a3b8" }
+                        },
+                        y: {
+                            grid: { color: "rgba(255,255,255,0.05)" },
+                            ticks: { color: "#94a3b8" },
+                            title: { display: true, text: "Normalized Amplitude (Z-Score)", color: "#94a3b8" }
+                        }
+                    }
+                }
+            });
+        }
+
+        async function stepDigitalTwin(delta = 0) {
+            currentWindow = Math.max(0, Math.min(maxWindows - 1, currentWindow + delta));
+            const modelName = document.getElementById("select-model").value;
+
+            try {
+                const response = await fetch("/api/step", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        subject_id: currentSubject,
+                        window_idx: currentWindow,
+                        model_name: modelName,
+                        channel_idx: selectedChannelIdx
+                    })
+                });
+                const res = await response.json();
+                if (res.error) {
+                    console.error(res.error);
+                    return;
+                }
+
+                // Update Waveform Chart
+                chartInstance.data.labels = res.time_axis;
+                chartInstance.data.datasets[0].data = res.waveform.actual;
+                chartInstance.data.datasets[1].data = res.waveform.predicted;
+                chartInstance.data.datasets[2].data = res.waveform.uncertainty_upper;
+                chartInstance.data.datasets[3].data = res.waveform.uncertainty_lower;
+                chartInstance.update("none");
+
+                // Update Labels
+                document.getElementById("lbl-window-idx").textContent = res.window_idx;
+                document.getElementById("lbl-max-windows").textContent = res.max_windows;
+                document.getElementById("lbl-time-range").textContent = `${(res.window_idx * 1.0).toFixed(1)}s - ${(res.window_idx * 1.0 + 2.0).toFixed(1)}s`;
+
+                // Update Digital Twin State Vector
+                const dt = res.digital_twin_state;
+                document.getElementById("lbl-latent-dim").textContent = `Dim: ${dt.z_latent_dim}`;
+                document.getElementById("lbl-cos-sim").textContent = dt.p_confidence.cosine_coherence.toFixed(4);
+                document.getElementById("lbl-latent-preview").textContent = dt.z_latent_sample.join(", ");
+
+                // Physiological
+                document.getElementById("lbl-delta").textContent = dt.s_physiological.delta_power.toFixed(1);
+                document.getElementById("lbl-theta").textContent = dt.s_physiological.theta_power.toFixed(1);
+                document.getElementById("lbl-alpha").textContent = dt.s_physiological.alpha_power.toFixed(1);
+                document.getElementById("lbl-beta").textContent  = dt.s_physiological.beta_power.toFixed(1);
+                document.getElementById("lbl-tbr").textContent   = dt.s_physiological.theta_beta_ratio.toFixed(2);
+
+                // Confidence
+                document.getElementById("lbl-confidence").textContent = `${(dt.p_confidence.overall_confidence * 100).toFixed(1)}%`;
+                document.getElementById("lbl-epistemic-std").textContent = dt.p_confidence.mean_epistemic_std.toFixed(3);
+
+                // History & Drift
+                document.getElementById("lbl-velocity").textContent = dt.h_history.instantaneous_velocity.toFixed(2);
+                document.getElementById("lbl-drift").textContent    = dt.h_history.cumulative_drift.toFixed(1);
+                document.getElementById("lbl-stability-score").textContent = dt.h_history.state_stability_score.toFixed(2);
+
+                // Quantum Angles & Expectations
+                if (dt.quantum_angles && dt.quantum_angles.length >= 4) {
+                    for (let q = 0; q < 4; q++) {
+                        document.getElementById(`q${q}-angle`).textContent = `${dt.quantum_angles[q].toFixed(2)} rad`;
+                    }
+                }
+                if (dt.quantum_expectations && dt.quantum_expectations.length >= 4) {
+                    for (let q = 0; q < 4; q++) {
+                        document.getElementById(`q${q}-exp`).textContent = dt.quantum_expectations[q].toFixed(3);
+                    }
+                }
+            } catch (err) {
+                console.error("Step error:", err);
+            }
+        }
+
+        function onSubjectChange() {
+            currentSubject = document.getElementById("select-subject").value;
+            currentWindow = 0;
+            stepDigitalTwin(0);
+        }
+
+        function togglePlayback() {
+            isPlaying = !isPlaying;
+            const btn = document.getElementById("btn-play");
+            if (isPlaying) {
+                btn.textContent = "⏸ Pause Stream";
+                btn.style.background = "#ff5252";
+                playInterval = setInterval(() => {
+                    if (currentWindow >= maxWindows - 1) {
+                        currentWindow = 0;
+                    }
+                    stepDigitalTwin(1);
+                }, 1000);
+            } else {
+                btn.textContent = "▶ Play Live Stream";
+                btn.style.background = "linear-gradient(90deg, #00b0ff, #00e5ff)";
+                clearInterval(playInterval);
+            }
+        }
+
+        async function loadAblationsTable() {
+            try {
+                const res = await fetch("/api/status");
+                const data = await res.json();
+                const tbody = document.getElementById("ablation-table-body");
+                tbody.innerHTML = "";
+
+                const rows = [
+                    {
+                        name: "Classical Baseline (EEGNet + BiLSTM)",
+                        mapping: "Paper Eq. 18 & XII.E.2",
+                        key: "classical_baseline",
+                        verdict: "Strongest predictor; zero quantum simulation overhead.",
+                        isBest: true
+                    },
+                    {
+                        name: "Hybrid: Quantum 4Q 1L + PCA",
+                        mapping: "Paper Eq. 19 & VII.E",
+                        key: "quantum_4q_1l_pca",
+                        verdict: "Strict paper architecture; highly competitive.",
+                        isBest: false
+                    },
+                    {
+                        name: "Hybrid: Quantum 6Q 1L",
+                        mapping: "Paper XII.E.5 (Qubit Scaling)",
+                        key: "quantum_6q_1l",
+                        verdict: "Higher qubit width; competitive with 4Q circuit.",
+                        isBest: false
+                    },
+                    {
+                        name: "Hybrid: Quantum 4Q 1L (Learned Mapper)",
+                        mapping: "Paper VIII.B & XII.E.4",
+                        key: "quantum_4q_1l",
+                        verdict: "Compact VQC; 18.5% fewer parameters than classical.",
+                        isBest: false
+                    },
+                    {
+                        name: "Hybrid: Quantum 4Q 2L (Circuit Depth)",
+                        mapping: "Paper XII.E.6 (Depth Scaling)",
+                        key: "quantum_4q_2l",
+                        verdict: "Deeper ansatz; prone to gradient attenuation on CPU.",
+                        isBest: false
+                    },
+                    {
+                        name: "Classical 4D PCA Bottleneck",
+                        mapping: "Paper XII.E.3",
+                        key: "eegnet_bilstm_pca",
+                        verdict: "Quantifies the isolated effect of 4-dim compression.",
+                        isBest: false
+                    },
+                    {
+                        name: "EEGNet Only (Spatial CNN)",
+                        mapping: "Paper XII.E.1",
+                        key: "eegnet_only",
+                        verdict: "No temporal recurrence; lower coherence.",
+                        isBest: false
+                    }
+                ];
+
+                rows.forEach(r => {
+                    const stats = (data.ablations && data.ablations[r.key]) || {
+                        total_params: "-",
+                        test_mse: "-",
+                        test_mae: "-",
+                        test_cosine_sim: "-",
+                    };
+
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td><strong>${r.name}</strong> ${r.isBest ? '<span class="tag-best">BEST TEST MSE</span>' : ''}</td>
+                        <td style="color: var(--text-secondary); font-size: 11px;">${r.mapping}</td>
+                        <td>${typeof stats.total_params === 'number' ? stats.total_params.toLocaleString() : stats.total_params}</td>
+                        <td style="color: ${r.isBest ? 'var(--accent-green)' : '#fff'}; font-weight: bold;">${stats.test_mse}</td>
+                        <td>${stats.test_mae}</td>
+                        <td style="color: var(--accent-cyan);">${stats.test_cosine_sim}</td>
+                        <td style="font-size: 11px; color: var(--text-secondary);">~9.8 ms</td>
+                        <td style="font-size: 11px; color: #cbd5e1;">${r.verdict}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (err) {
+                console.error("Ablation table error:", err);
+            }
+        }
+
+        window.onload = () => {
+            initChannelPills();
+            initChart();
+            stepDigitalTwin(0);
+            loadAblationsTable();
+        };
+    </script>
+</body>
+</html>

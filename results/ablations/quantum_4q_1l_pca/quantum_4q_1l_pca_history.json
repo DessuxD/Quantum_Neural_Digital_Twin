@@ -1,0 +1,75 @@
+{
+    "run_name": "quantum_4q_1l_pca",
+    "total_params": 219882,
+    "total_time_sec": 170.56,
+    "epochs_run": 5,
+    "best_val_loss": 0.9972985797458225,
+    "test_metrics": {
+        "val_loss": 0.9845889435874091,
+        "val_mse": 0.9147471163007949,
+        "val_cosine_similarity": 0.301581687397427,
+        "val_mae": 0.7480479743745592
+    },
+    "history": [
+        {
+            "epoch": 1,
+            "lr": 0.001,
+            "duration_sec": 32.98,
+            "train_loss": 1.1469141880671183,
+            "train_mse": 1.0470205161306594,
+            "train_cosine_similarity": 0.0010633027038743927,
+            "val_loss": 1.1159093141555787,
+            "val_mse": 1.0160846458541022,
+            "val_cosine_similarity": 0.0017531763451794783,
+            "val_mae": 0.7792973438898723
+        },
+        {
+            "epoch": 2,
+            "lr": 0.001,
+            "duration_sec": 39.09,
+            "train_loss": 1.099553640683492,
+            "train_mse": 1.0052827848328485,
+            "train_cosine_similarity": 0.057291425423075755,
+            "val_loss": 1.0639767421616448,
+            "val_mse": 0.9840577748086717,
+            "val_cosine_similarity": 0.20081032481458452,
+            "val_mae": 0.768324629465739
+        },
+        {
+            "epoch": 3,
+            "lr": 0.000854,
+            "duration_sec": 33.05,
+            "train_loss": 1.0183925165070429,
+            "train_mse": 0.9437489204936558,
+            "train_cosine_similarity": 0.25356408059597013,
+            "val_loss": 1.0122201985783048,
+            "val_mse": 0.9390126983324687,
+            "val_cosine_similarity": 0.2679249034987556,
+            "val_mae": 0.7489728556738959
+        },
+        {
+            "epoch": 4,
+            "lr": 0.0005,
+            "duration_sec": 32.33,
+            "train_loss": 0.9893573429849413,
+            "train_mse": 0.9193218800756666,
+            "train_cosine_similarity": 0.2996453669336107,
+            "val_loss": 0.9986553483539158,
+            "val_mse": 0.9272722283999125,
+            "val_cosine_similarity": 0.2861688365538915,
+            "val_mae": 0.7438170883390639
+        },
+        {
+            "epoch": 5,
+            "lr": 0.000146,
+            "duration_sec": 30.93,
+            "train_loss": 0.9805446108182271,
+            "train_mse": 0.9116783261299133,
+            "train_cosine_similarity": 0.31133709152539574,
+            "val_loss": 0.9972985797458225,
+            "val_mse": 0.9263069695896573,
+            "val_cosine_similarity": 0.29008404215176903,
+            "val_mae": 0.7436283257272508
+        }
+    ]
+}

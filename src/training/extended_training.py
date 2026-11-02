@@ -23,6 +23,11 @@ import torch.nn.functional as F
 from src.data.dataset import get_dataloaders
 from src.models.hybrid_twin import QuantumNeuralDigitalTwin
 from src.models.classical_baseline import ClassicalDigitalTwin
+from src.models.ablation_variants import (
+    EEGNetOnlyDigitalTwin,
+    EEGNetBiLSTM_PCADigitalTwin,
+    QuantumNeuralDigitalTwin_PCA,
+)
 
 
 # ──────────────────────────────────────────────
@@ -225,6 +230,28 @@ def run_single(
 # ──────────────────────────────────────────────
 
 ABLATION_CONFIGS = {
+    # 1. EEGNet alone (no temporal, no quantum) - Paper XII.E.1
+    "eegnet_only": dict(
+        model_cls="eegnet_only",
+        latent_dim=32,
+    ),
+    # 2. EEGNet + BiLSTM classical baseline - Paper XII.E.2 & Eq. 18
+    "classical_baseline": dict(
+        model_cls="classical",
+        spatial_dim=24, temporal_dim=24, fused_dim=48,
+    ),
+    # 3. EEGNet + BiLSTM + 4D PCA bottleneck - Paper XII.E.3
+    "eegnet_bilstm_pca": dict(
+        model_cls="eegnet_bilstm_pca",
+        spatial_dim=16, temporal_dim=16, pca_dim=4, fused_dim=32,
+    ),
+    # 4. EEGNet + BiLSTM + PCA + VQC (Paper Eq. 19 & XII.E.4)
+    "quantum_4q_1l_pca": dict(
+        model_cls="quantum_pca",
+        n_qubits=4, n_quantum_layers=1,
+        spatial_dim=16, temporal_dim=16, quantum_dim=8, fused_dim=40,
+    ),
+    # 5. Hybrid Variants (Learned mapper):
     "quantum_4q_1l": dict(
         model_cls="quantum",
         n_qubits=4, n_quantum_layers=1,
@@ -240,15 +267,35 @@ ABLATION_CONFIGS = {
         n_qubits=6, n_quantum_layers=1,
         spatial_dim=16, temporal_dim=16, quantum_dim=8,
     ),
-    "classical_baseline": dict(
-        model_cls="classical",
-        spatial_dim=24, temporal_dim=24, fused_dim=48,
-    ),
 }
 
 
 def build_model(cfg: dict) -> nn.Module:
-    if cfg["model_cls"] == "quantum":
+    cls = cfg["model_cls"]
+    if cls == "eegnet_only":
+        return EEGNetOnlyDigitalTwin(
+            n_channels=19, n_timesteps=500, n_subjects=36,
+            latent_dim=cfg.get("latent_dim", 32),
+        )
+    elif cls == "eegnet_bilstm_pca":
+        return EEGNetBiLSTM_PCADigitalTwin(
+            n_channels=19, n_timesteps=500, n_subjects=36,
+            spatial_dim=cfg.get("spatial_dim", 16),
+            temporal_dim=cfg.get("temporal_dim", 16),
+            pca_dim=cfg.get("pca_dim", 4),
+            fused_dim=cfg.get("fused_dim", 32),
+        )
+    elif cls == "quantum_pca":
+        return QuantumNeuralDigitalTwin_PCA(
+            n_channels=19, n_timesteps=500, n_subjects=36,
+            spatial_dim=cfg.get("spatial_dim", 16),
+            temporal_dim=cfg.get("temporal_dim", 16),
+            n_qubits=cfg.get("n_qubits", 4),
+            n_quantum_layers=cfg.get("n_quantum_layers", 1),
+            quantum_dim=cfg.get("quantum_dim", 8),
+            fused_dim=cfg.get("fused_dim", 40),
+        )
+    elif cls == "quantum":
         return QuantumNeuralDigitalTwin(
             n_channels=19, n_timesteps=500, n_subjects=36,
             n_qubits=cfg["n_qubits"],

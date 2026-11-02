@@ -10,6 +10,11 @@ from .dimension_reduction import SpatialEEG_PCA, QuantumStateMapper
 from .quantum_circuit import VariationalQuantumEncoder, build_vqc_qnode
 from .hybrid_twin import QuantumNeuralDigitalTwin, WaveformDecoder
 from .classical_baseline import ClassicalDigitalTwin
+from .ablation_variants import (
+    EEGNetOnlyDigitalTwin,
+    EEGNetBiLSTM_PCADigitalTwin,
+    QuantumNeuralDigitalTwin_PCA
+)
 
 __all__ = [
     "EEGNetEncoder",
@@ -21,4 +26,7 @@ __all__ = [
     "QuantumNeuralDigitalTwin",
     "WaveformDecoder",
     "ClassicalDigitalTwin",
+    "EEGNetOnlyDigitalTwin",
+    "EEGNetBiLSTM_PCADigitalTwin",
+    "QuantumNeuralDigitalTwin_PCA",
 ]
